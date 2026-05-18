@@ -1,5 +1,6 @@
 ﻿using API.DTO;
 using API.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace API.Controllers
@@ -20,6 +21,7 @@ namespace API.Controllers
             var books = await _bookService.GetAll();
             return Ok(books);
         }
+        [Authorize]
         [HttpGet("{id}")]
         public async Task<IActionResult> GetBookId(int id)
         {
@@ -30,12 +32,14 @@ namespace API.Controllers
             }
             return Ok(book);
         }
+        [Authorize]
         [HttpPost]
         public async Task<IActionResult> Create(BookDTO book)
         {
             var createdBook = await _bookService.Create(book);
             return Ok(createdBook);
         }
+        [Authorize]
         [HttpPut("{id}")]
         public async Task<IActionResult> Update(int id, BookDTO book)
         {
@@ -46,6 +50,7 @@ namespace API.Controllers
             }
             return Ok(updatedBook);
         }
+        [Authorize]
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
         {

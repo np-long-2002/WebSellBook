@@ -145,3 +145,5 @@ D:\WebSellBook\API\API\obj\Debug\net8.0\refint\API.dll
 D:\WebSellBook\API\API\obj\Debug\net8.0\API.pdb
 D:\WebSellBook\API\API\obj\Debug\net8.0\API.genruntimeconfig.cache
 D:\WebSellBook\API\API\obj\Debug\net8.0\ref\API.dll
+D:\WebSellBook\API\API\bin\Debug\net8.0\BCrypt-Net-Next.dll
+D:\WebSellBook\API\API\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
