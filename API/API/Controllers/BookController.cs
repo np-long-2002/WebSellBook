@@ -61,5 +61,41 @@ namespace API.Controllers
             }
             return NoContent();
         }
+        [HttpGet("{id}/preview")]
+        public async Task<IActionResult> GetPreview(int id)
+        {
+            var url =
+                await _bookService.GetPreviewFileUrl(id);
+
+            if (url == null)
+                return NotFound();
+
+            return Ok(url);
+        }
+
+        [Authorize]
+        [HttpPost("upload-image")]
+        public async Task<IActionResult> UploadImage(IFormFile file)
+        {
+            var imageUrl =
+                await _bookService.UploadImage(file);
+
+            return Ok(new
+            {
+                imageUrl
+            });
+        }
+
+        [Authorize]
+        [HttpPost("upload-preview")]
+        public async Task<IActionResult> UploadPreview(IFormFile file)
+        {
+            var previewUrl = await _bookService.UploadPreview(file);
+
+            return Ok(new
+            {
+                previewUrl
+            });
+        }
     }
 }

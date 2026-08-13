@@ -13,5 +13,11 @@ namespace API.Services
         Task<BookDTO?> Update(int id, BookDTO book);
 
         Task<bool> Delete(int id);
+
+        Task<string?> GetPreviewFileUrl(int id);
+
+        Task<string> UploadImage(IFormFile file);
+
+        Task<string> UploadPreview(IFormFile file);
     }
 }

@@ -1,5 +1,6 @@
 using API.Datas;
 using API.Services;
+using API.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -65,6 +66,28 @@ builder.Services.AddSwaggerGen(options =>
 });
 builder.Services.AddScoped<IBookService,BookService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
+builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddScoped<IAuthorService, AuthorService>();
+builder.Services.AddScoped<IUserService,UserService>();
+builder.Services.AddScoped<IVoucherService,VoucherService>();
+builder.Services.AddScoped<IPromotionService,PromotionService>();
+builder.Services.AddScoped<IEmailService,EmailService>();
+builder.Services.AddScoped<IReviewService,ReviewService>();
+builder.Services.AddScoped<IProfileService,ProfileService>();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReact",
+        policy =>
+        {
+            policy.AllowAnyOrigin()
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
+
 
 var app = builder.Build();
 
@@ -76,6 +99,10 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("AllowReact");
+
+app.UseStaticFiles();
 
 app.UseAuthentication();
 
