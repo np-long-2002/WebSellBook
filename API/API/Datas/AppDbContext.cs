@@ -17,7 +17,6 @@ namespace API.Datas
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<Review> Reviews { get; set; }
 
-        // ❗ THÊM
         public DbSet<Author> Authors { get; set; }
         public DbSet<Category> Categories { get; set; }
 
