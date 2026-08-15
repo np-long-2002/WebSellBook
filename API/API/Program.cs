@@ -84,12 +84,11 @@ builder.Services.AddScoped<IProfileService,ProfileService>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReact",
-        policy =>
-        {
-            policy.AllowAnyOrigin()
-                  .AllowAnyHeader()
-                  .AllowAnyMethod();
-        });
+        p => p
+            .SetIsOriginAllowed(_ => true)
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+    );
 });
 
 
@@ -98,6 +97,8 @@ var app = builder.Build();
 // Configure the HTTP request pipeline.
 app.UseSwagger();
 app.UseSwaggerUI();
+
+app.UseDeveloperExceptionPage();
 
 app.UseHttpsRedirection();
 
