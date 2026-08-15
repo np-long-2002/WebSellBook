@@ -121,62 +121,44 @@ namespace API.Services
 
         public async Task<string> Register(RegisterDTO dto)
         {
-            var existingUser = await _context.Users
-                .FirstOrDefaultAsync(u => u.Email == dto.Email);
-
-            if (existingUser != null)
+            try
             {
-                return "Email already exists";
+                var existingUser = await _context.Users
+                    .FirstOrDefaultAsync(u => u.Email == dto.Email);
+
+                if (existingUser != null)
+                {
+                    return "Email already exists";
+                }
+
+                string hashedPassword =
+                    BCrypt.Net.BCrypt.HashPassword(dto.Password);
+
+                var otp = new Random()
+                    .Next(100000, 999999)
+                    .ToString();
+
+                var user = new User
+                {
+                    FullName = dto.FullName,
+                    Email = dto.Email,
+                    PasswordHash = hashedPassword,
+                    Role = "User",
+                    IsVerified = false,
+                    VerificationCode = otp,
+                    VerificationCodeExpiry = DateTime.UtcNow.AddMinutes(10)
+                };
+
+                _context.Users.Add(user);
+
+                await _context.SaveChangesAsync();
+
+                return $"Đăng ký thành công. OTP: {otp}";
             }
-
-            string hashedPassword =
-                BCrypt.Net.BCrypt.HashPassword(dto.Password);
-
-            var otp =
-                new Random()
-                .Next(100000, 999999)
-                .ToString();
-
-            var user = new User
+            catch (Exception ex)
             {
-                FullName = dto.FullName,
-                Email = dto.Email,
-                PasswordHash = hashedPassword,
-
-                Role = "User",
-
-                IsVerified = false,
-
-                VerificationCode = otp,
-
-                // PostgreSQL nên dùng UTC
-                VerificationCodeExpiry =
-                    DateTime.UtcNow.AddMinutes(10)
-            };
-
-            _context.Users.Add(user);
-
-            await _context.SaveChangesAsync();
-
-            // ===== TẠM THỜI TẮT EMAIL ĐỂ TEST =====
-
-            /*
-            await _emailService.SendEmailAsync(
-                user.Email,
-                "Xác thực tài khoản BookStore",
-                $@"
-                <h2>BookStore</h2>
-
-                <p>Mã xác thực của bạn là:</p>
-
-                <h1>{otp}</h1>
-
-                <p>Mã có hiệu lực trong 10 phút.</p>
-                "
-            );
-            */
-
-            return $"Đăng ký thành công. OTP: {otp}";
+                return ex.ToString();
+            }
         }
         public async Task<string> ForgotPassword(
     ForgotPasswordDTO dto)
