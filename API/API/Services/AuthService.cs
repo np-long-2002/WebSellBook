@@ -123,52 +123,32 @@ namespace API.Services
         {
             try
             {
+                Console.WriteLine("REGISTER START");
+
                 var existingUser = await _context.Users
                     .FirstOrDefaultAsync(u => u.Email == dto.Email);
 
                 if (existingUser != null)
-                {
                     return "Email already exists";
-                }
-
-                string hashedPassword =
-                    BCrypt.Net.BCrypt.HashPassword(dto.Password);
-
-                var otp = new Random()
-                    .Next(100000, 999999)
-                    .ToString();
 
                 var user = new User
                 {
                     FullName = dto.FullName,
                     Email = dto.Email,
-                    PasswordHash = hashedPassword,
+                    PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
                     Role = "User",
-                    IsVerified = false,
-                    VerificationCode = otp,
-                    VerificationCodeExpiry = DateTime.UtcNow.AddMinutes(10)
+                    IsVerified = false
                 };
 
                 _context.Users.Add(user);
 
+                Console.WriteLine("BEFORE SAVE");
+
                 await _context.SaveChangesAsync();
 
-                Console.WriteLine("User saved");
+                Console.WriteLine($"AFTER SAVE ID={user.Id}");
 
-                await _emailService.SendEmailAsync(
-                    user.Email,
-                    "Xác thực tài khoản BookStore",
-                    $@"
-            <h2>BookStore</h2>
-            <p>Mã xác thực của bạn là:</p>
-            <h1>{otp}</h1>
-            <p>Mã có hiệu lực trong 10 phút.</p>
-            "
-                );
-
-                Console.WriteLine("Email sent");
-
-                return "Đăng ký thành công. Vui lòng kiểm tra email.";
+                return "SUCCESS";
             }
             catch (Exception ex)
             {
