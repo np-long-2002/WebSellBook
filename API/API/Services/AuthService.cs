@@ -107,7 +107,7 @@ namespace API.Services
                     claims: claims,
 
                     expires:
-                        DateTime.Now.AddDays(7),
+                        DateTime.UtcNow.AddDays(7),
 
                     signingCredentials:
                         creds
@@ -121,11 +121,8 @@ namespace API.Services
 
         public async Task<string> Register(RegisterDTO dto)
         {
-            var existingUser =
-                _context.Users
-                .FirstOrDefault(
-                    u => u.Email == dto.Email
-                );
+            var existingUser = await _context.Users
+                .FirstOrDefaultAsync(u => u.Email == dto.Email);
 
             if (existingUser != null)
             {
@@ -133,9 +130,7 @@ namespace API.Services
             }
 
             string hashedPassword =
-                BCrypt.Net.BCrypt.HashPassword(
-                    dto.Password
-                );
+                BCrypt.Net.BCrypt.HashPassword(dto.Password);
 
             var otp =
                 new Random()
@@ -154,32 +149,35 @@ namespace API.Services
 
                 VerificationCode = otp,
 
+                // PostgreSQL nên dùng UTC
                 VerificationCodeExpiry =
-                    DateTime.Now.AddMinutes(10)
+                    DateTime.UtcNow.AddMinutes(10)
             };
 
             _context.Users.Add(user);
 
             await _context.SaveChangesAsync();
 
+            // ===== TẠM THỜI TẮT EMAIL ĐỂ TEST =====
+
+            /*
             await _emailService.SendEmailAsync(
                 user.Email,
                 "Xác thực tài khoản BookStore",
                 $@"
-        <h2>BookStore</h2>
+                <h2>BookStore</h2>
 
-        <p>Mã xác thực của bạn là:</p>
+                <p>Mã xác thực của bạn là:</p>
 
-        <h1>{otp}</h1>
+                <h1>{otp}</h1>
 
-        <p>Mã có hiệu lực trong 10 phút.</p>
-        "
+                <p>Mã có hiệu lực trong 10 phút.</p>
+                "
             );
+            */
 
-            return
-                "Đăng ký thành công. Vui lòng kiểm tra email để xác thực tài khoản.";
+            return $"Đăng ký thành công. OTP: {otp}";
         }
-
         public async Task<string> ForgotPassword(
     ForgotPasswordDTO dto)
         {
@@ -198,7 +196,7 @@ namespace API.Services
                 Guid.NewGuid().ToString();
 
             user.ResetPasswordTokenExpiry =
-                DateTime.Now.AddMinutes(30);
+                DateTime.UtcNow.AddMinutes(30);
 
             await _context.SaveChangesAsync();
 
@@ -242,7 +240,7 @@ namespace API.Services
                 user.ResetPasswordTokenExpiry == null
                 ||
                 user.ResetPasswordTokenExpiry
-                < DateTime.Now
+                < DateTime.UtcNow
             )
             {
                 throw new Exception(
@@ -302,7 +300,7 @@ namespace API.Services
 
             if (
                 user.VerificationCodeExpiry
-                < DateTime.Now
+                < DateTime.UtcNow
             )
             {
                 throw new Exception(
