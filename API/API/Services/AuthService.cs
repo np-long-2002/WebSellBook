@@ -153,10 +153,26 @@ namespace API.Services
 
                 await _context.SaveChangesAsync();
 
-                return $"Đăng ký thành công. OTP: {otp}";
+                Console.WriteLine("User saved");
+
+                await _emailService.SendEmailAsync(
+                    user.Email,
+                    "Xác thực tài khoản BookStore",
+                    $@"
+            <h2>BookStore</h2>
+            <p>Mã xác thực của bạn là:</p>
+            <h1>{otp}</h1>
+            <p>Mã có hiệu lực trong 10 phút.</p>
+            "
+                );
+
+                Console.WriteLine("Email sent");
+
+                return "Đăng ký thành công. Vui lòng kiểm tra email.";
             }
             catch (Exception ex)
             {
+                Console.WriteLine(ex.ToString());
                 return ex.ToString();
             }
         }

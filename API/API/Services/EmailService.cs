@@ -18,7 +18,7 @@ namespace API.Services
     string subject,
     string body)
         {
-            Console.WriteLine("=== SEND MAIL START ===");
+            Console.WriteLine("=== SEND EMAIL START ===");
             Console.WriteLine($"TO: {to}");
 
             var email = new MimeMessage();
@@ -43,19 +43,21 @@ namespace API.Services
             await smtp.ConnectAsync(
                 _config["EmailSettings:Host"],
                 int.Parse(_config["EmailSettings:Port"]),
-                SecureSocketOptions.StartTls);
+                SecureSocketOptions.StartTls
+            );
 
-            Console.WriteLine("Connected SMTP");
+            Console.WriteLine("Connected");
 
             await smtp.AuthenticateAsync(
                 _config["EmailSettings:Email"],
-                _config["EmailSettings:Password"]);
+                _config["EmailSettings:Password"]
+            );
 
             Console.WriteLine("Authenticated");
 
             await smtp.SendAsync(email);
 
-            Console.WriteLine("Mail Sent");
+            Console.WriteLine("Email Sent");
 
             await smtp.DisconnectAsync(true);
         }
