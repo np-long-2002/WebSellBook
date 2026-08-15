@@ -14,10 +14,13 @@ namespace API.Services
         }
 
         public async Task SendEmailAsync(
-            string to,
-            string subject,
-            string body)
+    string to,
+    string subject,
+    string body)
         {
+            Console.WriteLine("=== SEND MAIL START ===");
+            Console.WriteLine($"TO: {to}");
+
             var email = new MimeMessage();
 
             email.From.Add(
@@ -26,8 +29,7 @@ namespace API.Services
                 ));
 
             email.To.Add(
-                MailboxAddress.Parse(to)
-            );
+                MailboxAddress.Parse(to));
 
             email.Subject = subject;
 
@@ -40,18 +42,20 @@ namespace API.Services
 
             await smtp.ConnectAsync(
                 _config["EmailSettings:Host"],
-                int.Parse(
-                    _config["EmailSettings:Port"]
-                ),
-                SecureSocketOptions.StartTls
-            );
+                int.Parse(_config["EmailSettings:Port"]),
+                SecureSocketOptions.StartTls);
+
+            Console.WriteLine("Connected SMTP");
 
             await smtp.AuthenticateAsync(
                 _config["EmailSettings:Email"],
-                _config["EmailSettings:Password"]
-            );
+                _config["EmailSettings:Password"]);
+
+            Console.WriteLine("Authenticated");
 
             await smtp.SendAsync(email);
+
+            Console.WriteLine("Mail Sent");
 
             await smtp.DisconnectAsync(true);
         }
