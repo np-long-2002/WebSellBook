@@ -131,13 +131,19 @@ namespace API.Services
                 if (existingUser != null)
                     return "Email already exists";
 
+                var otp = new Random()
+                    .Next(100000, 999999)
+                    .ToString();
+
                 var user = new User
                 {
                     FullName = dto.FullName,
                     Email = dto.Email,
                     PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.Password),
                     Role = "User",
-                    IsVerified = false
+                    IsVerified = false,
+                    VerificationCode = otp,
+                    VerificationCodeExpiry = DateTime.UtcNow.AddMinutes(10)
                 };
 
                 _context.Users.Add(user);
@@ -147,6 +153,21 @@ namespace API.Services
                 await _context.SaveChangesAsync();
 
                 Console.WriteLine($"AFTER SAVE ID={user.Id}");
+
+                Console.WriteLine("BEFORE SEND EMAIL");
+
+                await _emailService.SendEmailAsync(
+                    user.Email,
+                    "Xác thực tài khoản BookStore",
+                    $@"
+            <h2>BookStore</h2>
+            <p>Mã OTP của bạn là:</p>
+            <h1>{otp}</h1>
+            <p>Có hiệu lực trong 10 phút.</p>
+            "
+                );
+
+                Console.WriteLine("AFTER SEND EMAIL");
 
                 return "SUCCESS";
             }

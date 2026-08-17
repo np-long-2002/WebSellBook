@@ -8,7 +8,7 @@
 
         public int UserId { get; set; }
 
-        public DateTime UsedAt { get; set; } = DateTime.Now;
+        public DateTime UsedAt { get; set; } = DateTime.UtcNow;
 
         public Voucher? Voucher { get; set; }
 

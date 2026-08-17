@@ -10,13 +10,16 @@ namespace API.Services
     {
         private readonly AppDbContext _context;
         private readonly IPromotionService _promotionService;
+        private readonly SupabaseStorageService _storage;
 
         public BookService(
             AppDbContext context,
-            IPromotionService promotionService)
+            IPromotionService promotionService,
+            SupabaseStorageService storage)
         {
             _context = context;
             _promotionService = promotionService;
+            _storage = storage;
         }
 
         public async Task<BookDTO> Create(BookDTO book)
@@ -66,20 +69,76 @@ namespace API.Services
 
             return true;
         }
+        public async Task<IEnumerable<BookDTO>> GetAll()
+        {
+            try
+            {
+                Console.WriteLine("GET ALL BOOKS START");
+
+                var books = await _context.Books.ToListAsync();
+
+                Console.WriteLine($"TOTAL BOOKS: {books.Count}");
+
+                var result = new List<BookDTO>();
+
+                foreach (var book in books)
+                {
+                    try
+                    {
+                        result.Add(await MapBook(book));
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine(
+                            $"MAP BOOK ERROR ID={book.Id}"
+                        );
+
+                        Console.WriteLine(ex.ToString());
+
+                        throw;
+                    }
+                }
+
+                Console.WriteLine("GET ALL BOOKS SUCCESS");
+
+                return result;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("GET ALL BOOKS FAILED");
+
+                Console.WriteLine(ex.ToString());
+
+                throw;
+            }
+        }
+
         private async Task<BookDTO> MapBook(Book book)
         {
-            var discount =
-                await _promotionService
-                .GetBestDiscountPercentAsync(book.Id);
+            decimal discount = 0;
+
+            try
+            {
+                discount =
+                    await _promotionService
+                    .GetBestDiscountPercentAsync(book.Id);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(
+                    $"PROMOTION ERROR BOOK ID={book.Id}"
+                );
+
+                Console.WriteLine(ex.ToString());
+
+                discount = 0;
+            }
 
             return new BookDTO
             {
                 Id = book.Id,
-
                 Title = book.Title,
-
                 Description = book.Description,
-
                 Price = book.Price,
 
                 DiscountPercent = discount,
@@ -107,25 +166,8 @@ namespace API.Services
                 ImageUrl = book.ImageUrl,
 
                 PreviewFileUrl =
-                    string.IsNullOrEmpty(book.PreviewFileUrl)
-                    ? null
-                    : $"http://localhost:5000/{book.PreviewFileUrl}"
+                    book.PreviewFileUrl
             };
-        }
-        public async Task<IEnumerable<BookDTO>> GetAll()
-        {
-            var books = await _context.Books.ToListAsync();
-
-            var result = new List<BookDTO>();
-
-            foreach (var book in books)
-            {
-                result.Add(
-                    await MapBook(book)
-                );
-            }
-
-            return result;
         }
         public async Task<BookDTO?> GetById(int id)
         {
@@ -184,95 +226,18 @@ namespace API.Services
                 CategoryId = dbBook.CategoryId,
                 ImageUrl = dbBook.ImageUrl,
 
-                PreviewFileUrl =
-                    string.IsNullOrEmpty(dbBook.PreviewFileUrl)
-                    ? null
-                    : $"http://localhost:5000/{dbBook.PreviewFileUrl}"
+                PreviewFileUrl = book.PreviewFileUrl
             };
         }
 
-        public async Task<string> UploadImage(
-    IFormFile file
-)
+        public async Task<string> UploadImage(IFormFile file)
         {
-            var uploadsFolder =
-                Path.Combine(
-                    Directory.GetCurrentDirectory(),
-                    "wwwroot",
-                    "images"
-                );
-
-            if (!Directory.Exists(uploadsFolder))
-            {
-                Directory.CreateDirectory(
-                    uploadsFolder
-                );
-            }
-
-            var fileName =
-                Guid.NewGuid() +
-                Path.GetExtension(
-                    file.FileName
-                );
-
-            var filePath =
-                Path.Combine(
-                    uploadsFolder,
-                    fileName
-                );
-
-            using (var stream =
-                new FileStream(
-                    filePath,
-                    FileMode.Create
-                ))
-            {
-                await file.CopyToAsync(stream);
-            }
-
-            return $"images/{fileName}";
+            return await _storage.UploadImage(file);
         }
 
-        public async Task<string> UploadPreview(
-            IFormFile file
-        )
+        public async Task<string> UploadPreview(IFormFile file)
         {
-            var previewFolder =
-                Path.Combine(
-                    Directory.GetCurrentDirectory(),
-                    "wwwroot",
-                    "previews"
-                );
-
-            if (!Directory.Exists(previewFolder))
-            {
-                Directory.CreateDirectory(
-                    previewFolder
-                );
-            }
-
-            var fileName =
-                Guid.NewGuid() +
-                Path.GetExtension(
-                    file.FileName
-                );
-
-            var filePath =
-                Path.Combine(
-                    previewFolder,
-                    fileName
-                );
-
-            using (var stream =
-                new FileStream(
-                    filePath,
-                    FileMode.Create
-                ))
-            {
-                await file.CopyToAsync(stream);
-            }
-
-            return $"previews/{fileName}";
+            return await _storage.UploadPreview(file);
         }
     }
 }

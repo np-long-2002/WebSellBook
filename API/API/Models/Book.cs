@@ -20,7 +20,7 @@
         public string? ImageUrl { get; set; }
 
         public DateTime CreatedAt { get; set; }
-            = DateTime.Now;
+            = DateTime.UtcNow;
 
         public string? PreviewFileUrl { get; set; }
 

@@ -103,7 +103,7 @@ namespace API.Services
                 };
             }
 
-            if (DateTime.Now < voucher.StartDate)
+            if (DateTime.UtcNow < voucher.StartDate)
             {
                 return new VoucherResultDTO
                 {
@@ -112,7 +112,7 @@ namespace API.Services
                 };
             }
 
-            if (DateTime.Now > voucher.ExpiredAt)
+            if (DateTime.UtcNow > voucher.ExpiredAt)
             {
                 return new VoucherResultDTO
                 {

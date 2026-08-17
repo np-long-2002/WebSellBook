@@ -289,7 +289,7 @@ namespace API.Services
         public async Task<decimal>
     GetBestDiscountPercentAsync(int bookId)
         {
-            var now = DateTime.Now;
+            var now = DateTime.UtcNow;
 
             var book = await _context.Books
                 .FirstOrDefaultAsync(x => x.Id == bookId);

@@ -1,9 +1,16 @@
+import api from "../services/api";
+
 function PdfModal({
   isOpen,
   onClose,
   pdfUrl,
 }) {
   if (!isOpen) return null;
+
+  const fullPdfUrl =
+    pdfUrl?.startsWith("http")
+      ? pdfUrl
+      : `${api.defaults.baseURL}${pdfUrl}`;
 
   return (
     <div
@@ -45,14 +52,10 @@ function PdfModal({
         </button>
 
         <iframe
-          src={pdfUrl}
-          title="Preview PDF"
-          className="
-          w-full
-          h-full
-          rounded-2xl
-          "
-        />
+  src={pdfUrl}
+  title="Preview PDF"
+  className="w-full h-full rounded-2xl"
+/>
       </div>
     </div>
   );

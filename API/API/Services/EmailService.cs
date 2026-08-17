@@ -1,65 +1,33 @@
-﻿using MailKit.Net.Smtp;
-using MimeKit;
-using MailKit.Security;
+﻿using Resend;
 
 namespace API.Services
 {
     public class EmailService : IEmailService
     {
-        private readonly IConfiguration _config;
+        private readonly IResend _resend;
 
-        public EmailService(IConfiguration config)
+        public EmailService(IResend resend)
         {
-            _config = config;
+            _resend = resend;
         }
 
         public async Task SendEmailAsync(
-    string to,
-    string subject,
-    string body)
+            string to,
+            string subject,
+            string body)
         {
-            Console.WriteLine("=== SEND EMAIL START ===");
-            Console.WriteLine($"TO: {to}");
-
-            var email = new MimeMessage();
-
-            email.From.Add(
-                MailboxAddress.Parse(
-                    _config["EmailSettings:Email"]
-                ));
-
-            email.To.Add(
-                MailboxAddress.Parse(to));
-
-            email.Subject = subject;
-
-            email.Body = new TextPart("html")
+            var message = new EmailMessage
             {
-                Text = body
+                From = "onboarding@resend.dev",
+                Subject = subject,
+                HtmlBody = body
             };
 
-            using var smtp = new SmtpClient();
+            message.To.Add(to);
 
-            await smtp.ConnectAsync(
-                _config["EmailSettings:Host"],
-                int.Parse(_config["EmailSettings:Port"]),
-                SecureSocketOptions.StartTls
-            );
+            var result = await _resend.EmailSendAsync(message);
 
-            Console.WriteLine("Connected");
-
-            await smtp.AuthenticateAsync(
-                _config["EmailSettings:Email"],
-                _config["EmailSettings:Password"]
-            );
-
-            Console.WriteLine("Authenticated");
-
-            await smtp.SendAsync(email);
-
-            Console.WriteLine("Email Sent");
-
-            await smtp.DisconnectAsync(true);
+            Console.WriteLine($"Email Sent: {result.Content}");
         }
     }
 }

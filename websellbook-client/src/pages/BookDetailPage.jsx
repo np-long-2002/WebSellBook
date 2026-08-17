@@ -9,6 +9,7 @@ import BookDescriptionSection from '../components/BookDescriptionSection';
 import ReviewsSection from '../components/ReviewsSection';
 import PdfModal from '../components/PdfModal';
 import noBook from '../assets/nobook.png';
+import api from '../services/api';
 
 /**
  * BookDetailPage - Main page for displaying book details
@@ -94,12 +95,9 @@ function BookDetailPage() {
   }
 
   // Get image URL with fallback
-  const imageUrl = !book.imageUrl
-    ? noBook
-    : book.imageUrl.startsWith('http')
-      ? book.imageUrl
-      : `http://localhost:5000/${book.imageUrl.replace(/^\/+/, '')}`;
+ const API_URL = "https://websellbook-production.up.railway.app";
 
+const imageUrl = book?.imageUrl || noBook;
   // Handle add to cart
   const handleAddToCart = (bookItem, quantity) => {
     addToCartWithQuantity(bookItem, quantity);
@@ -149,11 +147,17 @@ function BookDetailPage() {
       </div>
 
       {/* PDF Preview Modal */}
-      <PdfModal
-        isOpen={showPdf}
-        onClose={() => setShowPdf(false)}
-        pdfUrl={book.previewFileUrl}
-      />
+   const previewUrl = book.previewFileUrl
+  ? book.previewFileUrl.startsWith("http")
+      ? book.previewFileUrl
+      : `${API_URL}/${book.previewFileUrl.replace(/^\/+/, "")}`
+  : null;
+
+<PdfModal
+  isOpen={showPdf}
+  onClose={() => setShowPdf(false)}
+  pdfUrl={previewUrl}
+/>
     </div>
   );
 }

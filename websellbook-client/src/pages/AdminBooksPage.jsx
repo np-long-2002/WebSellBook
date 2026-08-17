@@ -8,6 +8,7 @@ import {
 } from "../services/bookService";
 
 import BookModal from "../components/BookModal";
+import { API_URL } from "../config";
 
 function AdminBooksPage() {
 
@@ -291,21 +292,16 @@ function AdminBooksPage() {
                   {book.imageUrl && (
 
                     <img
-                      src={
-                        book.imageUrl?.startsWith("http")
-                          ? book.imageUrl
-                          : `http://localhost:5000/${book.imageUrl}`
-                      }
-                      alt={book.title}
-                      className="
-                    w-16
-                    h-20
-                    object-cover
-                    rounded-lg
-                    mx-auto
-                    "
-                    />
-
+  src={`${API_URL}${book.imageUrl}`}
+  alt={book.title}
+  className="
+  w-16
+  h-20
+  object-cover
+  rounded-lg
+  mx-auto
+  "
+/>
                   )}
 
                 </td>
@@ -336,15 +332,13 @@ function AdminBooksPage() {
                   {book.previewFileUrl && (
 
                     <a
-                      href={`http://localhost:5000/${book.previewFileUrl}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="
-                    text-blue-600
-                    "
-                    >
-                      PDF
-                    </a>
+  href={`${API_URL}${book.previewFileUrl}`}
+  target="_blank"
+  rel="noreferrer"
+  className="text-blue-600"
+>
+  PDF
+</a>
 
                   )}
 

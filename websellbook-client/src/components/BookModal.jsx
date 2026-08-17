@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-
+import { API_URL } from "../config";
 import {
   uploadImage,
   uploadPreview
@@ -397,17 +397,21 @@ return (
 
         {form.imageUrl && (
           <div className="flex justify-center">
-            <img
-              src={`http://localhost:5000/${form.imageUrl}`}
-              alt=""
-              className="
-              w-36
-              h-52
-              object-cover
-              rounded-xl
-              shadow
-              "
-            />
+          <img
+  src={
+    form.imageUrl?.startsWith("http")
+      ? form.imageUrl
+      : `${API_URL}${form.imageUrl}`
+  }
+  alt=""
+  className="
+  w-36
+  h-52
+  object-cover
+  rounded-xl
+  shadow
+  "
+/>
           </div>
         )}
 
@@ -437,28 +441,26 @@ return (
         </div>
 
         {form.previewFileUrl && (
-          <a
-            href={
-              form.previewFileUrl.startsWith(
-                "http"
-              )
-                ? form.previewFileUrl
-                : `http://localhost:5000/${form.previewFileUrl}`
-            }
-            target="_blank"
-            rel="noreferrer"
-            className="
-            inline-flex
-            bg-blue-100
-            text-blue-700
-            px-4
-            py-2
-            rounded-xl
-            "
-          >
-            View Current PDF
-          </a>
-        )}
+  <a
+    href={
+      form.previewFileUrl.startsWith("http")
+        ? form.previewFileUrl
+        : `${API_URL}${form.previewFileUrl}`
+    }
+    target="_blank"
+    rel="noreferrer"
+    className="
+    inline-flex
+    bg-blue-100
+    text-blue-700
+    px-4
+    py-2
+    rounded-xl
+    "
+  >
+    View Current PDF
+  </a>
+)}
 
         {/* FOOTER */}
 

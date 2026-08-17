@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using Resend;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -80,6 +81,7 @@ builder.Services.AddScoped<IPromotionService,PromotionService>();
 builder.Services.AddScoped<IEmailService,EmailService>();
 builder.Services.AddScoped<IReviewService,ReviewService>();
 builder.Services.AddScoped<IProfileService,ProfileService>();
+builder.Services.AddSingleton<SupabaseStorageService>();
 
 builder.Services.AddCors(options =>
 {
@@ -91,6 +93,15 @@ builder.Services.AddCors(options =>
     );
 });
 
+builder.Services.AddOptions();
+
+builder.Services.Configure<ResendClientOptions>(o =>
+{
+    o.ApiToken = builder.Configuration["RESEND_API_KEY"];
+});
+
+builder.Services.AddHttpClient<ResendClient>();
+builder.Services.AddTransient<IResend, ResendClient>();
 
 var app = builder.Build();
 
@@ -111,5 +122,31 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+    await db.Database.MigrateAsync();
+
+    if (!await db.Users.AnyAsync(u => u.Role == "Admin"))
+    {
+        var admin = new User
+        {
+            FullName = "Administrator",
+            Email = "admin@websellbook.com",
+            PasswordHash = BCrypt.Net.BCrypt.HashPassword("Admin@123"),
+            Role = "Admin",
+            IsVerified = true,
+            CreatedAt = DateTime.UtcNow
+        };
+
+        db.Users.Add(admin);
+        await db.SaveChangesAsync();
+
+        Console.WriteLine("Admin account created!");
+    }
+}
 
 app.Run();
