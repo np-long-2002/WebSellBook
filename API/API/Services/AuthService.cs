@@ -86,7 +86,7 @@ namespace API.Services
             var key =
                 new SymmetricSecurityKey(
                     Encoding.UTF8.GetBytes(
-                        _configuration["Jwt:Key"]
+                        _configuration["JWT_SECRET"]
                     )
                 );
 
