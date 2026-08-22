@@ -14,9 +14,15 @@ namespace API.Services
             var key =
                 Environment.GetEnvironmentVariable("SUPABASE_KEY");
 
+            if (string.IsNullOrEmpty(url))
+                throw new Exception("SUPABASE_URL not found");
+
+            if (string.IsNullOrEmpty(key))
+                throw new Exception("SUPABASE_KEY not found");
+
             _client = new Supabase.Client(url, key);
 
-            _client.InitializeAsync().Wait();
+            _client.InitializeAsync().GetAwaiter().GetResult();
         }
 
         public async Task<string> UploadImage(IFormFile file)
@@ -25,7 +31,6 @@ namespace API.Services
                 $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
 
             using var stream = file.OpenReadStream();
-
             using var ms = new MemoryStream();
 
             await stream.CopyToAsync(ms);
@@ -34,10 +39,7 @@ namespace API.Services
 
             await _client.Storage
                 .From("book-images")
-                .Upload(
-                    bytes,
-                    fileName
-                );
+                .Upload(bytes, fileName);
 
             return _client.Storage
                 .From("book-images")
@@ -50,7 +52,6 @@ namespace API.Services
                 $"{Guid.NewGuid()}{Path.GetExtension(file.FileName)}";
 
             using var stream = file.OpenReadStream();
-
             using var ms = new MemoryStream();
 
             await stream.CopyToAsync(ms);
@@ -59,10 +60,7 @@ namespace API.Services
 
             await _client.Storage
                 .From("book-previews")
-                .Upload(
-                    bytes,
-                    fileName
-                );
+                .Upload(bytes, fileName);
 
             return _client.Storage
                 .From("book-previews")

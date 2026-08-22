@@ -62,37 +62,43 @@ function CartPage() {
       ? 0
       : 30000;
 
-  const finalAmount =
+  const finalAmount = Math.max(
+    0,
     totalAmount +
     shippingFee -
-    discountAmount;
-
-  const handleApplyVoucher =
-    async () => {
-      try {
-  await checkout({
-    receiverName,
-    receiverPhone,
-    shippingAddress,
-    items: cartItems,
-    voucherCode
-  });
-}
-catch (error) {
-
-  console.log("FULL ERROR:", error);
-
-  console.log(
-    "SERVER ERROR:",
-    error.response?.data
+    discountAmount
   );
 
-  alert(
-    error.response?.data?.message ||
-    "Checkout failed"
-  );
-}
-    };
+  const handleApplyVoucher = async () => {
+    if (!voucherCode.trim()) {
+      setVoucherError("Vui lòng nhập mã voucher");
+      return;
+    }
+
+    try {
+      setVoucherError("");
+      const result = await applyVoucher(voucherCode, totalAmount);
+
+      const discount = typeof result === "number"
+        ? result
+        : (result?.discountAmount ?? result?.discount ?? 0);
+
+      setDiscountAmount(discount);
+      setVoucherResult({
+        voucherCode: voucherCode,
+        discountAmount: discount,
+        ...result,
+      });
+    } catch (error) {
+      console.log("APPLY VOUCHER ERROR:", error);
+      setDiscountAmount(0);
+      setVoucherResult(null);
+      setVoucherError(
+        error.response?.data?.message ||
+        "Mã voucher không hợp lệ hoặc không đủ điều kiện áp dụng"
+      );
+    }
+  };
 
  const handleCheckout = async () => {
   try {
