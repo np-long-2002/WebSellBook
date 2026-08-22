@@ -99,10 +99,10 @@ namespace API.Services
             var token =
                 new JwtSecurityToken(
                     issuer:
-                        _configuration["Jwt:Issuer"],
+    _configuration["JWT_ISSUER"],
 
-                    audience:
-                        _configuration["Jwt:Audience"],
+audience:
+    _configuration["JWT_AUDIENCE"],
 
                     claims: claims,
 
