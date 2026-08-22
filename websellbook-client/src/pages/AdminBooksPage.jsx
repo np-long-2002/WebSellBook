@@ -292,16 +292,16 @@ function AdminBooksPage() {
                   {book.imageUrl && (
 
                     <img
-  src={`${API_URL}${book.imageUrl}`}
-  alt={book.title}
-  className="
+                      src={book.imageUrl}
+                      alt={book.title}
+                      className="
   w-16
   h-20
   object-cover
   rounded-lg
   mx-auto
   "
-/>
+                    />
                   )}
 
                 </td>
@@ -332,13 +332,13 @@ function AdminBooksPage() {
                   {book.previewFileUrl && (
 
                     <a
-  href={`${API_URL}${book.previewFileUrl}`}
-  target="_blank"
-  rel="noreferrer"
-  className="text-blue-600"
->
-  PDF
-</a>
+                      href={book.previewFileUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="text-blue-600"
+                    >
+                      PDF
+                    </a>
 
                   )}
 

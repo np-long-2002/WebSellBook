@@ -165,7 +165,7 @@ namespace API.Services
 
                 if (
                     voucher.StartDate >
-                    DateTime.Now
+                    DateTime.UtcNow
                 )
                 {
                     throw new Exception(
@@ -175,7 +175,7 @@ namespace API.Services
 
                 if (
                     voucher.ExpiredAt <
-                    DateTime.Now
+                    DateTime.UtcNow
                 )
                 {
                     throw new Exception(
@@ -269,7 +269,7 @@ namespace API.Services
                     "Pending",
 
                 CreatedAt =
-                    DateTime.Now
+                    DateTime.UtcNow
             };
 
             _context.Orders.Add(
@@ -310,7 +310,7 @@ namespace API.Services
                             voucher.Id,
 
                         UsedAt =
-                            DateTime.Now
+                            DateTime.UtcNow
                     }
                 );
 

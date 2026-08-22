@@ -17,7 +17,7 @@
         public bool IsActive { get; set; } = true;
 
         public DateTime CreatedAt { get; set; }
-            = DateTime.Now;
+            = DateTime.UtcNow;
 
         public ICollection<PromotionBook> PromotionBooks
             = new List<PromotionBook>();

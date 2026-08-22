@@ -69,7 +69,7 @@ namespace API.Services
                     dto.Comment;
 
                 existedReview.CreatedAt =
-                    DateTime.Now;
+                    DateTime.UtcNow;
 
                 await _context.SaveChangesAsync();
 

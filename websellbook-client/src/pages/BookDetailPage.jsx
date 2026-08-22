@@ -98,6 +98,11 @@ function BookDetailPage() {
  const API_URL = "https://websellbook-production.up.railway.app";
 
 const imageUrl = book?.imageUrl || noBook;
+const previewUrl = book?.previewFileUrl
+  ? book.previewFileUrl.startsWith("http")
+    ? book.previewFileUrl
+    : `${API_URL}/${book.previewFileUrl.replace(/^\/+/, "")}`
+  : null;
   // Handle add to cart
   const handleAddToCart = (bookItem, quantity) => {
     addToCartWithQuantity(bookItem, quantity);
@@ -147,13 +152,7 @@ const imageUrl = book?.imageUrl || noBook;
       </div>
 
       {/* PDF Preview Modal */}
-   const previewUrl = book.previewFileUrl
-  ? book.previewFileUrl.startsWith("http")
-      ? book.previewFileUrl
-      : `${API_URL}/${book.previewFileUrl.replace(/^\/+/, "")}`
-  : null;
-
-<PdfModal
+  <PdfModal
   isOpen={showPdf}
   onClose={() => setShowPdf(false)}
   pdfUrl={previewUrl}

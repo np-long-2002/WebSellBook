@@ -1,2 +1,0 @@
-export const API_URL =
-  "https://websellbook-production.up.railway.app";

@@ -1,5 +1,6 @@
 import { useContext, useState } from "react";
 import { CartContext } from "../context/CartContext";
+import { useNavigate } from "react-router-dom";
 
 import { checkout } from "../services/orderService";
 import { applyVoucher } from "../services/voucherService";
@@ -7,6 +8,8 @@ import { applyVoucher } from "../services/voucherService";
 import noBook from "../assets/nobook.png";
 
 function CartPage() {
+
+  const navigate = useNavigate();
 
   const {
     cartItems,
@@ -67,97 +70,93 @@ function CartPage() {
   const handleApplyVoucher =
     async () => {
       try {
+  await checkout({
+    receiverName,
+    receiverPhone,
+    shippingAddress,
+    items: cartItems,
+    voucherCode
+  });
+}
+catch (error) {
 
-        const result =
-          await applyVoucher(
-            voucherCode,
-            totalAmount
-          );
+  console.log("FULL ERROR:", error);
 
-        setVoucherError("");
+  console.log(
+    "SERVER ERROR:",
+    error.response?.data
+  );
 
-        setVoucherResult(result);
-
-        setDiscountAmount(
-          result.discountAmount
-        );
-
-      } catch (error) {
-
-        setVoucherResult(null);
-
-        setDiscountAmount(0);
-
-        setVoucherError(
-          error.response?.data?.message ||
-          error.message ||
-          "Voucher không hợp lệ"
-        );
-      }
+  alert(
+    error.response?.data?.message ||
+    "Checkout failed"
+  );
+}
     };
 
- const handleCheckout =
-  async () => {
-
-    try {
-
-      if (
-        !receiverName ||
-        !receiverPhone ||
-        !shippingAddress
-      ) {
-
-        alert(
-          "Vui lòng nhập đầy đủ thông tin giao hàng"
-        );
-
-        return;
-      }
-
-      const result =
-        await checkout({
-
-          receiverName,
-
-          receiverPhone,
-
-          shippingAddress,
-
-          items: cartItems,
-
-          voucherCode:
-            voucherResult?.voucherCode
-
-        });
-
-      alert(
-        `Đặt hàng thành công!
-Order ID: ${result.id}`
-      );
-
-      clearCart();
-
-    } catch (error) {
-
-      console.log(error);
-
-      if (
-        error.response
-      ) {
-
-        alert(
-          error.response.data.message
-        );
-
-      } else {
-
-        alert(
-          "Checkout thất bại"
-        );
-
-      }
+ const handleCheckout = async () => {
+  try {
+    if (!receiverName.trim()) {
+      alert("Nhập tên người nhận");
+      return;
     }
-  };
+
+    if (!receiverPhone.trim()) {
+      alert("Nhập số điện thoại");
+      return;
+    }
+
+    if (!shippingAddress.trim()) {
+      alert("Nhập địa chỉ");
+      return;
+    }
+
+    if (cartItems.length === 0) {
+      alert("Giỏ hàng trống");
+      return;
+    }
+
+    const result = await checkout({
+      receiverName,
+      receiverPhone,
+      shippingAddress,
+      voucherCode,
+      items: cartItems.map(item => ({
+        bookId: item.id,
+        quantity: item.quantity,
+      })),
+    });
+
+    alert("Đặt hàng thành công");
+
+    clearCart();
+
+    navigate("/orders");
+  }
+  catch (error) {
+    console.log(error);
+
+    console.log(
+      "STATUS:",
+      error.response?.status
+    );
+
+    console.log(
+      "DATA:",
+      error.response?.data
+    );
+
+    console.log(
+      "VALIDATION ERRORS:",
+      error.response?.data?.errors
+    );
+
+    alert(
+      error.response?.data?.message ||
+      "Checkout thất bại"
+    );
+  }
+};
 
   if (
     cartItems.length === 0

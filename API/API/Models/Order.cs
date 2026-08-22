@@ -23,7 +23,7 @@
         public string ShippingAddress { get; set; }
 
         public DateTime CreatedAt { get; set; }
-            = DateTime.Now;
+            = DateTime.UtcNow;
 
         // ===== Navigation =====
 

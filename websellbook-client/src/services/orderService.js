@@ -18,16 +18,18 @@ export const checkout = async ({
     receiverPhone,
     shippingAddress,
 
-    items: items.map((item) => ({
-      bookId: Number(item.id),
-      quantity: Number(item.quantity),
-    })),
+    items: items.map((item) => {
+      console.log("DEBUG ITEM:", item);
+      return {
+        bookId: item.id || item.bookId || item._id, // Bỏ parseInt nếu ID là chuỗi/GUID
+        quantity: parseInt(item.quantity, 10),
+      };
+    }),
 
     voucherCode: voucherCode || null,
   };
 
   console.log("CHECKOUT PAYLOAD", payload);
-
   const response = await api.post(
     `${ENDPOINT}/checkout`,
     payload
@@ -90,3 +92,4 @@ export const cancelOrder = async (
 
   return response.data;
 };
+
