@@ -1,7 +1,10 @@
 import axios from "axios";
 
+// Lấy URL từ biến môi trường, nếu không có thì dùng URL mặc định
+const BASE_URL = import.meta.env.VITE_API_URL || "https://websellbook-production.up.railway.app";
+
 const api = axios.create({
-  baseURL: "https://websellbook-production.up.railway.app",
+  baseURL: BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
@@ -15,11 +18,12 @@ api.interceptors.request.use(
 
     // Loại bỏ dấu ngoặc kép thừa nếu có
     if (token) {
-        token = token.replace(/^"|"$/g, '');
+      token = token.replace(/^"|"$/g, "");
     }
 
     // Chỉ gắn token nếu không phải là request đăng nhập hoặc đăng ký
-    const isAuthRequest = config.url.includes("/Auth/login") || config.url.includes("/Auth/register");
+    const isAuthRequest =
+      config.url.includes("/Auth/login") || config.url.includes("/Auth/register");
 
     if (token && !isAuthRequest) {
       config.headers["Authorization"] = `Bearer ${token}`;
@@ -36,13 +40,13 @@ api.interceptors.response.use(
   (error) => {
     // Nếu bị 401, chỉ logout nếu request đó là request cần bảo mật cao
     if (error.response?.status === 401) {
-       console.warn("Lỗi 401: Token có thể đã hết hạn hoặc không hợp lệ tại", error.config.url);
+      console.warn("Lỗi 401: Token có thể đã hết hạn hoặc không hợp lệ tại", error.config.url);
 
-       // Chỉ logout ở các trang cực kỳ nhạy cảm để tránh bị đá văng liên tục
-       const criticalPaths = ["/checkout", "/profile", "/orders"];
-       if (criticalPaths.some(p => window.location.pathname.includes(p))) {
-      localStorage.removeItem("token");
-      localStorage.removeItem("user");
+      // Chỉ logout ở các trang cực kỳ nhạy cảm để tránh bị đá văng liên tục
+      const criticalPaths = ["/checkout", "/profile", "/orders"];
+      if (criticalPaths.some((p) => window.location.pathname.includes(p))) {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
         window.location.href = "/";
       }
     }
@@ -51,7 +55,7 @@ api.interceptors.response.use(
 );
 
 export const publicApi = axios.create({
-  baseURL: "https://websellbook-production.up.railway.app",
+  baseURL: BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
