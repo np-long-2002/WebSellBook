@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 
 import {
@@ -34,12 +35,20 @@ function LoginModal({
             password
           );
 
-        localStorage.setItem(
-          "token",
-          result.token
-        );
+        console.log("Login result:", result);
 
-        window.location.reload();
+        // Lưu token dựa trên cấu trúc phổ biến nhất của ASP.NET Core
+        // Thử lấy token từ thuộc tính token, accessToken, hoặc chính result nếu nó là string
+        const token = result.token || result.accessToken || (typeof result === 'string' ? result : null);
+
+        if (token) {
+          localStorage.setItem("token", token);
+          closeModal(); // Đóng modal trước
+          window.location.reload(); // Reload lại trang
+        } else {
+          console.log("Response structure:", result);
+          alert("Đăng nhập thành công nhưng không tìm thấy token trong phản hồi. Kiểm tra Console!");
+        }
 
       } catch (error) {
 

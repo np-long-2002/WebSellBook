@@ -1,24 +1,23 @@
+
 import { jwtDecode } from "jwt-decode";
 
-export const getUserInfo = () => {
+export const getToken = () => {
+  return localStorage.getItem("token");
+};
 
-  const token =
-    localStorage.getItem("token");
+export const getUserInfo = () => {
+  const token = getToken();
 
   if (!token) return null;
 
   try {
-
-    const decoded =
-      jwtDecode(token);
+    const decoded = jwtDecode(token);
 
     return {
       id:
+        decoded["UserId"] ||
         decoded["nameid"] ||
-        decoded["sub"] ||
-        decoded[
-          "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"
-        ],
+        decoded["sub"],
 
       fullName:
         decoded[
@@ -33,19 +32,39 @@ export const getUserInfo = () => {
       role:
         decoded[
           "http://schemas.microsoft.com/ws/2008/06/identity/claims/role"
-        ]
+        ],
+
+      exp: decoded.exp,
     };
-
   } catch {
-
     return null;
-
   }
 };
 
 export const getRole = () => {
-
-  const user = getUserInfo();
-
-  return user?.role || null;
+  return getUserInfo()?.role || null;
 };
+
+export const isLoggedIn = () => {
+  return !!getToken();
+};
+
+export const isTokenExpired = () => {
+  const token = getToken();
+
+  if (!token) return true;
+
+  try {
+    const decoded = jwtDecode(token);
+
+    return decoded.exp * 1000 < Date.now();
+  } catch {
+    return true;
+  }
+};
+
+export const logout = () => {
+  localStorage.removeItem("token");
+  localStorage.removeItem("user");
+};
+

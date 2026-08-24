@@ -26,6 +26,12 @@ var connectionString =
 var jwtSecret =
     Environment.GetEnvironmentVariable("JWT_SECRET");
 
+var jwtIssuer =
+    Environment.GetEnvironmentVariable("JWT_ISSUER");
+
+var jwtAudience =
+    Environment.GetEnvironmentVariable("JWT_AUDIENCE");
+
 var resendApiKey =
     Environment.GetEnvironmentVariable("RESEND_API_KEY");
 
@@ -40,6 +46,12 @@ if (string.IsNullOrEmpty(connectionString))
 
 if (string.IsNullOrEmpty(jwtSecret))
     throw new Exception("JWT_SECRET is missing");
+
+if (string.IsNullOrEmpty(jwtIssuer))
+    throw new Exception("JWT_ISSUER is missing");
+
+if (string.IsNullOrEmpty(jwtAudience))
+    throw new Exception("JWT_AUDIENCE is missing");
 
 // ========================================
 // Controllers
@@ -76,13 +88,15 @@ builder.Services
                 ValidateLifetime = true,
                 ValidateIssuerSigningKey = true,
 
-                ValidIssuer = "WebSellBookAPI",
+                ValidIssuer = jwtIssuer,
 
-                ValidAudience = "WebSellBookClient",
+                ValidAudience = jwtAudience,
 
                 IssuerSigningKey =
                     new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(jwtSecret)
+                        Encoding.UTF8.GetBytes(
+                            jwtSecret
+                        )
                     )
             };
     });

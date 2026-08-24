@@ -77,9 +77,12 @@ try {
     "Invalid token"
   );
 
-  localStorage.removeItem(
-    "token"
-  );
+
+
+
+  // localStorage.removeItem(
+  //   "token"
+  // ); // Đã comment để tránh việc tự động xóa token khi trang load
 }
 
   useEffect(() => {
@@ -144,62 +147,74 @@ try {
 
     <header
       className="
-      sticky
-      top-0
+      fixed
+      top-4
+      left-4
+      right-4
       z-50
-      bg-white
-      shadow-md
-      "
-    >
+              rounded-2xl
+      bg-white/40
+      backdrop-blur-xl
+      border
+      border-white/40
+      shadow-lg
+              "
+            >
 
-      <div
-        className="
+                  <div
+                    className="
         max-w-7xl
         mx-auto
         px-6
-        h-20
-        flex
-        items-center
+                      h-16
+          flex
+          items-center
         justify-between
         gap-8
-        "
-      >
+          "
+        >
 
         {/* LOGO */}
 
-        <Link
-          to="/"
-          className="
-          text-3xl
-          font-extrabold
-          text-blue-600
+          <Link
+            to="/"
+            className="
+          text-2xl
+          font-black
+          tracking-tighter
+          text-transparent
+          bg-clip-text
+          bg-gradient-to-r
+          from-indigo-600
+          to-purple-500
           whitespace-nowrap
-          "
-        >
-          📚 BookStore
-        </Link>
+            "
+          >
+          BOOKSTORE.
+          </Link>
 
         {/* SEARCH */}
-
-        <div
-          className="
+              <div
+                className="
           relative
           flex-1
           max-w-2xl
-          "
-        >
+                "
+              >
 
           <div
-            className="
+                  className="
             flex
-            border-2
-            border-blue-500
-            rounded-full
+            border
+            border-white/50
+                  rounded-full
             overflow-hidden
-            bg-white
-            "
-          >
-
+            bg-white/50
+            focus-within:bg-white
+            focus-within:border-indigo-400
+                  transition
+                  "
+                >
             <input
               type="text"
               placeholder="Search books..."
@@ -209,28 +224,28 @@ try {
                   e.target.value
                 )
               }
-              className="
+                  className="
               flex-1
               px-5
-              py-3
+              py-2
+              bg-transparent
               outline-none
-              "
+                  "
             />
-
-            <button
+              <button
               className="
-              bg-blue-600
+              bg-indigo-600
               text-white
               px-6
+              rounded-r-full
               "
             >
               <FaSearch />
-            </button>
+              </button>
 
           </div>
 
           {suggestions.length > 0 && (
-
             <div
               className="
               absolute
@@ -238,23 +253,25 @@ try {
               left-0
               right-0
               mt-2
-              bg-white
+              bg-white/80
+              backdrop-blur-xl
+              border
+              border-white/20
               rounded-2xl
-              shadow-xl
+              shadow-2xl
               overflow-hidden
               "
             >
 
               {suggestions.map(
                 (book) => (
-
                   <div
                     key={book.id}
                     onClick={() => {
 
                       navigate(
                         `/book/${book.id}`
-                      );
+  );
 
                       setKeyword("");
 
@@ -266,7 +283,8 @@ try {
                     gap-3
                     p-3
                     cursor-pointer
-                    hover:bg-slate-100
+                    hover:bg-blue-50
+                    transition
                     "
                   >
 
@@ -320,13 +338,16 @@ try {
           flex
           items-center
           gap-5
+          text-gray-700
+          font-bold
           "
         >
 
           <Link
             to="/"
             className="
-            hover:text-blue-600
+            hover:text-indigo-600
+            transition
             "
           >
             Home
@@ -338,19 +359,21 @@ try {
               <Link
                 to="/orders"
                 className="
-      hover:text-blue-600
-      "
+                hover:text-indigo-600
+                transition
+                "
               >
-                My Orders
+                Orders
               </Link>
 
               <Link
                 to="/profile"
                 className="
-      hover:text-blue-600
-      "
+                hover:text-indigo-600
+                transition
+                "
               >
-                My Profile
+                Profile
               </Link>
             </>
 
@@ -360,6 +383,8 @@ try {
             className="
             relative
             text-xl
+            hover:text-indigo-600
+            transition
             "
           >
 
@@ -374,10 +399,10 @@ try {
                 -right-3
                 bg-red-500
                 text-white
-                text-xs
+                text-[10px]
                 rounded-full
-                w-5
-                h-5
+                w-4
+                h-4
                 flex
                 items-center
                 justify-center
@@ -399,6 +424,7 @@ try {
                 flex
                 flex-col
                 text-right
+                leading-none
                 "
               >
 
@@ -413,21 +439,11 @@ try {
 
                 <span
                   className="
-                  text-xs
-                  text-gray-500
+                  text-[10px]
+                  text-gray-400
                   "
                 >
                   {email}
-                </span>
-
-                <span
-                  className="
-                  text-xs
-                  text-blue-600
-                  font-semibold
-                  "
-                >
-                  {role}
                 </span>
 
               </div>
@@ -440,12 +456,13 @@ try {
                   flex
                   items-center
                   gap-2
-                  bg-purple-600
-                  text-white
+                  bg-purple-500/20
+                  text-purple-700
                   px-4
-                  py-2
-                  rounded-xl
-                  hover:bg-purple-700
+                  py-1.5
+                  rounded-full
+                  hover:bg-purple-500/30
+                  transition
                   "
                 >
                   <FaUserShield />
@@ -462,12 +479,13 @@ try {
                   flex
                   items-center
                   gap-2
-                  bg-green-600
-                  text-white
+                  bg-emerald-500/20
+                  text-emerald-700
                   px-4
-                  py-2
-                  rounded-xl
-                  hover:bg-green-700
+                  py-1.5
+                  rounded-full
+                  hover:bg-emerald-500/30
+                  transition
                   "
                 >
                   <FaBriefcase />
@@ -479,14 +497,11 @@ try {
               <button
                 onClick={
                   handleLogout
-                }
+}
                 className="
-                bg-red-500
-                text-white
-                px-4
-                py-2
-                rounded-xl
-                hover:bg-red-600
+                text-gray-500
+                hover:text-red-500
+                transition
                 "
               >
                 Logout
@@ -501,14 +516,17 @@ try {
                 openLogin
               }
               className="
-              bg-blue-600
+              bg-indigo-600
               text-white
-              px-4
-              py-2
-              rounded-xl
+              px-5
+              py-1.5
+              rounded-full
               flex
               items-center
               gap-2
+              hover:bg-indigo-700
+              hover:scale-105
+              transition-all
               "
             >
               <FaUser />

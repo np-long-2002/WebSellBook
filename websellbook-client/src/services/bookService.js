@@ -1,4 +1,4 @@
-import api from './api';
+import api, { publicApi } from './api';
 
 const ENDPOINT = '/Book';
 
@@ -7,7 +7,7 @@ const ENDPOINT = '/Book';
  * @returns {Promise<Array>} List of books
  */
 export const getBooks = async () => {
-  const response = await api.get(ENDPOINT);
+  const response = await publicApi.get(ENDPOINT);
   return response.data;
 };
 

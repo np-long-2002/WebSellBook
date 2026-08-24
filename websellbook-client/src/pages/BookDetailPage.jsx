@@ -46,15 +46,26 @@ function BookDetailPage() {
       const result = await canReview(id);
       setCanUserReview(result);
     } catch (error) {
+      // Bỏ qua lỗi 401 khi kiểm tra quyền đánh giá (trường hợp chưa đăng nhập hoặc token hết hạn)
+      if (error.response?.status !== 401) {
       console.error('Failed to check review permission:', error);
+    }
     }
   };
 
   // Load book data on mount
   useEffect(() => {
+    if (!id) return;
+
     const fetchData = async () => {
       try {
         setLoading(true);
+        const token = localStorage.getItem('token');
+        if (!token) {
+        setLoading(false);
+          return;
+      }
+
         const bookData = await getBookById(id);
         setBook(bookData);
         await loadReviews();
@@ -81,6 +92,26 @@ function BookDetailPage() {
       </div>
     );
   }
+
+  // Not logged in state
+  const token = localStorage.getItem('token');
+  if (!token) {
+    return (
+      <div className="h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center max-w-md mx-auto p-8 bg-white rounded-2xl shadow-lg">
+          <div className="text-6xl mb-4">🔒</div>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">Yêu cầu đăng nhập</h2>
+          <p className="text-gray-600 mb-6">Bạn cần đăng nhập để xem thông tin chi tiết sản phẩm này.</p>
+          <button
+            onClick={() => navigate('/')}
+            className="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded-xl transition shadow"
+          >
+            Về trang chủ / Đăng nhập
+            </button>
+          </div>
+      </div>
+  );
+}
 
   // Book not found
   if (!book) {
@@ -162,3 +193,4 @@ const previewUrl = book?.previewFileUrl
 }
 
 export default BookDetailPage;
+

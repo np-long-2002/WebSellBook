@@ -84,11 +84,13 @@ namespace API.Services
     };
 
             var key =
-                new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes(
-                        _configuration["JWT_SECRET"]
-                    )
-                );
+    new SymmetricSecurityKey(
+        Encoding.UTF8.GetBytes(
+            Environment.GetEnvironmentVariable(
+                "JWT_SECRET"
+            )!
+        )
+    );
 
             var creds =
                 new SigningCredentials(
@@ -99,10 +101,14 @@ namespace API.Services
             var token =
                 new JwtSecurityToken(
                     issuer:
-    _configuration["JWT_ISSUER"],
+                        Environment.GetEnvironmentVariable(
+                            "JWT_ISSUER"
+                        ),
 
-audience:
-    _configuration["JWT_AUDIENCE"],
+                    audience:
+                        Environment.GetEnvironmentVariable(
+                            "JWT_AUDIENCE"
+                        ),
 
                     claims: claims,
 
